@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel · Loja do Sorveteiro</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0E2E56">
+<style>
+  :root{
+    --azul:#1A4E8C;--azul-esc:#0E2E56;--azul-mais:#143f74;--fundo:#EEF3F9;--branco:#fff;
+    --tinta:#16273D;--tinta-2:#4E627A;--linha:#D8E3F0;--coral:#EC5A76;--coral-esc:#D6415F;
+    --ok:#1f9d6b;--raio:12px;color-scheme:only light;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--fundo);color:var(--tinta);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--azul)}
+  h1,h2,h3{margin:0;font-weight:700}
+  .esconde{display:none!important}
+  .btn{display:inline-flex;align-items:center;gap:7px;border:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;padding:11px 16px;border-radius:100px;line-height:1;transition:.15s}
+  .btn--azul{background:var(--azul);color:#fff}.btn--azul:hover{background:var(--azul-mais)}
+  .btn--coral{background:var(--coral);color:#fff}.btn--coral:hover{background:var(--coral-esc)}
+  .btn--linha{background:#fff;color:var(--tinta);box-shadow:inset 0 0 0 1.5px var(--linha)}.btn--linha:hover{box-shadow:inset 0 0 0 1.5px var(--azul)}
+  .btn--pq{padding:7px 12px;font-size:13px}
+  input,textarea,select{font:inherit;padding:11px 13px;border:1px solid var(--linha);border-radius:10px;background:#fff;color:var(--tinta);width:100%}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--azul)}
+  label{font-size:13px;font-weight:700;color:var(--tinta-2);display:block;margin-bottom:5px}
+  .campo{margin-bottom:13px}
+
+  /* LOGIN */
+  .login-tela{min-height:100vh;display:grid;place-items:center;padding:20px}
+  .login-cx{background:#fff;border-radius:18px;box-shadow:0 24px 50px -28px rgba(14,46,86,.5);padding:30px 26px;width:100%;max-width:380px}
+  .login-cx h1{font-size:21px;color:var(--azul-esc);text-align:center}
+  .login-cx .sub{text-align:center;color:var(--tinta-2);font-size:14px;margin:6px 0 22px}
+  .msg{font-size:13.5px;font-weight:700;margin-top:12px;min-height:18px}
+  .msg.erro{color:var(--coral-esc)}.msg.ok{color:var(--ok)}
+
+  /* PAINEL */
+  .topo{background:var(--azul-esc);color:#fff;padding:14px 18px;padding-top:calc(14px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+  .topo h1{font-size:17px}
+  .topo .sair{background:rgba(255,255,255,.14);color:#fff;border:0;padding:8px 14px;border-radius:100px;font-weight:700;font-size:13px;cursor:pointer}
+  .abas{display:flex;gap:6px;padding:12px 16px 0;max-width:900px;margin:0 auto;flex-wrap:wrap}
+  .aba{background:none;border:0;cursor:pointer;font:inherit;font-weight:700;font-size:14px;color:var(--tinta-2);padding:9px 14px;border-radius:100px}
+  .aba.on{background:var(--azul);color:#fff}
+  .conteudo{max-width:900px;margin:0 auto;padding:16px}
+  .cartao{background:#fff;border:1px solid var(--linha);border-radius:var(--raio);padding:18px;margin-bottom:14px}
+  .cartao h2{font-size:16px;color:var(--azul-esc);margin-bottom:14px}
+  .linha-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--linha)}
+  .linha-item:first-child{border-top:0}
+  .linha-item .cresce{flex:1;min-width:0}
+  .linha-item .tit{font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .linha-item .sub{font-size:13px;color:var(--tinta-2)}
+  .pill{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:100px;white-space:nowrap}
+  .pill--on{background:#E3F5EC;color:#177a52}.pill--off{background:#F0E4E8;color:#9a4763}
+  .acoes{display:flex;gap:6px;flex-wrap:wrap}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--linha);vertical-align:top}
+  th{color:var(--tinta-2);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}.tbl-scroll{overflow-x:auto}}
+  .vazio{color:var(--tinta-2);font-size:14px;padding:14px 0}
+  .modal{position:fixed;inset:0;background:rgba(14,46,86,.5);display:none;place-items:center;padding:16px;z-index:20;overflow:auto}
+  .modal.on{display:grid}
+  .modal-cx{background:#fff;border-radius:16px;width:100%;max-width:560px;padding:22px;max-height:92vh;overflow:auto}
+  .modal-cx h2{font-size:18px;color:var(--azul-esc);margin-bottom:16px}
+  .modal-pe{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div class="login-tela" id="tela-login">
+  <div class="login-cx">
+    <h1>Painel da Loja do Sorveteiro</h1>
+    <p class="sub">Entre para gerenciar receitas e ver os orçamentos.</p>
+    <div class="campo"><label for="l-email">E-mail</label><input id="l-email" type="email" autocomplete="username"></div>
+    <div class="campo"><label for="l-senha">Senha</label><input id="l-senha" type="password" autocomplete="current-password"></div>
+    <button class="btn btn--azul" id="l-entrar" style="width:100%;justify-content:center">Entrar</button>
+    <p class="msg" id="l-msg" role="status" aria-live="polite"></p>
+  </div>
+</div>
+
+<!-- ===== PAINEL ===== -->
+<div id="tela-painel" class="esconde">
+  <div class="topo">
+    <h1>Loja do Sorveteiro · Painel</h1>
+    <button class="sair" id="sair">Sair</button>
+  </div>
+  <div class="abas">
+    <button class="aba on" data-aba="receitas">Receitas</button>
+    <button class="aba" data-aba="leads">Orçamentos</button>
+  </div>
+
+  <!-- RECEITAS -->
+  <div class="conteudo" id="sec-receitas">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px">
+      <h2 style="font-size:17px;color:var(--azul-esc)">Receitas</h2>
+      <button class="btn btn--coral" id="nova-receita">+ Nova receita</button>
+    </div>
+    <div class="cartao"><div id="lista-receitas"><p class="vazio">Carregando…</p></div></div>
+  </div>
+
+  <!-- LEADS -->
+  <div class="conteudo esconde" id="sec-leads">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px">
+      <h2 style="font-size:17px;color:var(--azul-esc)">Orçamentos recebidos</h2>
+      <button class="btn btn--linha" id="baixar-csv">Baixar CSV</button>
+    </div>
+    <div class="cartao tbl-scroll"><div id="lista-leads"><p class="vazio">Carregando…</p></div></div>
+  </div>
+</div>
+
+<!-- MODAL RECEITA -->
+<div class="modal" id="modal-r">
+  <div class="modal-cx">
+    <h2 id="mr-titulo">Nova receita</h2>
+    <input type="hidden" id="r-id">
+    <div class="campo"><label for="r-titulo">Título</label><input id="r-titulo" maxlength="160"></div>
+    <div class="grid2">
+      <div class="campo"><label for="r-categoria">Categoria</label><input id="r-categoria" maxlength="60" placeholder="Ex.: Bolo, Sorvete"></div>
+      <div class="campo"><label for="r-ordem">Ordem</label><input id="r-ordem" type="number" value="0"></div>
+    </div>
+    <div class="campo"><label for="r-resumo">Resumo (chamada curta)</label><textarea id="r-resumo" maxlength="400" rows="2"></textarea></div>
+    <div class="campo"><label for="r-imagem">URL da imagem</label><input id="r-imagem" maxlength="800" placeholder="https://…"></div>
+    <div class="campo"><label for="r-conteudo">Receita (ingredientes e modo de preparo)</label><textarea id="r-conteudo" rows="7"></textarea></div>
+    <div class="campo"><label style="display:flex;align-items:center;gap:8px;font-weight:700"><input type="checkbox" id="r-publicado" style="width:auto"> Publicar no site</label></div>
+    <p class="msg" id="mr-msg"></p>
+    <div class="modal-pe">
+      <button class="btn btn--linha" id="mr-cancelar">Cancelar</button>
+      <button class="btn btn--azul" id="mr-salvar">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var SB={ url:'https://tbbdxyogrlfvinediqjg.supabase.co', key:'sb_publishable_IgahcMqYtvuSPpFQU-7mbA_w_BbSxYZ' };
+  var TOKEN=sessionStorage.getItem('sorv_adm_tok')||null;
+  var leadsCache=[];
+  var $=function(id){return document.getElementById(id);};
+  var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+
+  function db(path,opts){
+    opts=opts||{};
+    opts.headers=Object.assign({apikey:SB.key,Authorization:'Bearer '+TOKEN,'Content-Type':'application/json'},opts.headers||{});
+    return fetch(SB.url+'/rest/v1/'+path,opts);
+  }
+
+  /* ---------- LOGIN ---------- */
+  function entrar(){
+    var email=$('l-email').value.trim(), senha=$('l-senha').value;
+    var msg=$('l-msg'); msg.textContent=''; msg.className='msg';
+    if(!email||!senha){ msg.textContent='Preencha e-mail e senha.'; msg.className='msg erro'; return; }
+    var b=$('l-entrar'); b.disabled=true; b.textContent='Entrando…';
+    fetch(SB.url+'/auth/v1/token?grant_type=password',{
+      method:'POST',headers:{apikey:SB.key,'Content-Type':'application/json'},
+      body:JSON.stringify({email:email,password:senha})
+    }).then(function(r){return r.json();}).then(function(d){
+      if(d.access_token){ TOKEN=d.access_token; sessionStorage.setItem('sorv_adm_tok',TOKEN); abrirPainel(); }
+      else { msg.textContent='E-mail ou senha incorretos.'; msg.className='msg erro'; }
+    }).catch(function(){ msg.textContent='Erro de conexão. Tente de novo.'; msg.className='msg erro'; })
+      .then(function(){ b.disabled=false; b.textContent='Entrar'; });
+  }
+  function sair(){ TOKEN=null; sessionStorage.removeItem('sorv_adm_tok'); $('tela-painel').classList.add('esconde'); $('tela-login').classList.remove('esconde'); }
+  function abrirPainel(){ $('tela-login').classList.add('esconde'); $('tela-painel').classList.remove('esconde'); carregarReceitas(); carregarLeads(); }
+
+  /* ---------- ABAS ---------- */
+  document.querySelectorAll('.aba').forEach(function(a){
+    a.addEventListener('click',function(){
+      document.querySelectorAll('.aba').forEach(function(x){x.classList.remove('on');}); a.classList.add('on');
+      var alvo=a.getAttribute('data-aba');
+      $('sec-receitas').classList.toggle('esconde',alvo!=='receitas');
+      $('sec-leads').classList.toggle('esconde',alvo!=='leads');
+    });
+  });
+
+  /* ---------- RECEITAS ---------- */
+  function carregarReceitas(){
+    db('sorv_receitas?select=*&order=ordem.asc,criado_em.desc').then(function(r){return r.json();}).then(function(itens){
+      var box=$('lista-receitas');
+      if(!itens||!itens.length){ box.innerHTML='<p class="vazio">Nenhuma receita ainda. Toque em “+ Nova receita”.</p>'; return; }
+      box.innerHTML=itens.map(function(r){
+        var pill=r.publicado?'<span class="pill pill--on">no site</span>':'<span class="pill pill--off">rascunho</span>';
+        return '<div class="linha-item"><div class="cresce"><div class="tit">'+esc(r.titulo)+'</div>'+
+          '<div class="sub">'+esc(r.categoria||'sem categoria')+'</div></div>'+pill+
+          '<div class="acoes"><button class="btn btn--linha btn--pq" data-edit="'+r.id+'">Editar</button>'+
+          '<button class="btn btn--linha btn--pq" data-del="'+r.id+'">Excluir</button></div></div>';
+      }).join('');
+      box.querySelectorAll('[data-edit]').forEach(function(b){ b.onclick=function(){ editarReceita(itens.find(function(x){return x.id===b.getAttribute('data-edit');})); }; });
+      box.querySelectorAll('[data-del]').forEach(function(b){ b.onclick=function(){ excluirReceita(b.getAttribute('data-del')); }; });
+    }).catch(function(){ $('lista-receitas').innerHTML='<p class="vazio">Erro ao carregar. Saia e entre de novo.</p>'; });
+  }
+  function abrirModal(r){
+    r=r||{};
+    $('mr-titulo').textContent=r.id?'Editar receita':'Nova receita';
+    $('r-id').value=r.id||''; $('r-titulo').value=r.titulo||''; $('r-categoria').value=r.categoria||'';
+    $('r-ordem').value=r.ordem!=null?r.ordem:0; $('r-resumo').value=r.resumo||''; $('r-imagem').value=r.imagem_url||'';
+    $('r-conteudo').value=r.conteudo||''; $('r-publicado').checked=!!r.publicado; $('mr-msg').textContent='';
+    $('modal-r').classList.add('on');
+  }
+  function editarReceita(r){ abrirModal(r); }
+  function fecharModal(){ $('modal-r').classList.remove('on'); }
+  function slugify(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60); }
+  function salvarReceita(){
+    var id=$('r-id').value;
+    var corpo={
+      titulo:$('r-titulo').value.trim(), categoria:$('r-categoria').value.trim()||null,
+      ordem:parseInt($('r-ordem').value,10)||0, resumo:$('r-resumo').value.trim()||null,
+      imagem_url:$('r-imagem').value.trim()||null, conteudo:$('r-conteudo').value.trim()||null,
+      publicado:$('r-publicado').checked
+    };
+    if(!corpo.titulo){ $('mr-msg').textContent='O título é obrigatório.'; $('mr-msg').className='msg erro'; return; }
+    if(!id) corpo.slug=slugify(corpo.titulo)+'-'+Date.now().toString(36).slice(-4);
+    var b=$('mr-salvar'); b.disabled=true; b.textContent='Salvando…';
+    var req=id
+      ? db('sorv_receitas?id=eq.'+id,{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify(corpo)})
+      : db('sorv_receitas',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify(corpo)});
+    req.then(function(r){
+      if(r.ok){ fecharModal(); carregarReceitas(); }
+      else { r.text().then(function(t){ $('mr-msg').textContent='Erro: '+t; $('mr-msg').className='msg erro'; }); }
+    }).catch(function(){ $('mr-msg').textContent='Erro de conexão.'; $('mr-msg').className='msg erro'; })
+      .then(function(){ b.disabled=false; b.textContent='Salvar'; });
+  }
+  function excluirReceita(id){
+    if(!confirm('Excluir esta receita? Não dá pra desfazer.')) return;
+    db('sorv_receitas?id=eq.'+id,{method:'DELETE',headers:{Prefer:'return=minimal'}}).then(function(r){ if(r.ok) carregarReceitas(); });
+  }
+
+  /* ---------- LEADS ---------- */
+  function carregarLeads(){
+    db('sorv_leads?select=*&order=criado_em.desc').then(function(r){return r.json();}).then(function(itens){
+      leadsCache=itens||[];
+      var box=$('lista-leads');
+      if(!leadsCache.length){ box.innerHTML='<p class="vazio">Nenhum orçamento recebido ainda.</p>'; return; }
+      var linhas=leadsCache.map(function(l){
+        var d=new Date(l.criado_em); var data=isNaN(d)?'':d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+        var wa='https://wa.me/55'+String(l.whatsapp||'').replace(/\D/g,'');
+        var sel=['novo','contatado','fechado','descartado'].map(function(s){return '<option value="'+s+'"'+(l.status===s?' selected':'')+'>'+s+'</option>';}).join('');
+        return '<tr><td>'+esc(data)+'</td><td><b>'+esc(l.nome)+'</b><br><a href="'+wa+'" target="_blank" rel="noopener">'+esc(l.whatsapp)+'</a></td>'+
+          '<td>'+esc(l.mensagem||'—')+'</td>'+
+          '<td><select data-status="'+l.id+'">'+sel+'</select></td></tr>';
+      }).join('');
+      box.innerHTML='<table><thead><tr><th>Quando</th><th>Contato</th><th>Mensagem</th><th>Status</th></tr></thead><tbody>'+linhas+'</tbody></table>';
+      box.querySelectorAll('[data-status]').forEach(function(s){
+        s.onchange=function(){ db('sorv_leads?id=eq.'+s.getAttribute('data-status'),{method:'PATCH',headers:{Prefer:'return=minimal'},body:JSON.stringify({status:s.value})}); };
+      });
+    }).catch(function(){ $('lista-leads').innerHTML='<p class="vazio">Erro ao carregar. Saia e entre de novo.</p>'; });
+  }
+  function baixarCSV(){
+    if(!leadsCache.length){ alert('Nada para exportar ainda.'); return; }
+    var cab=['Recebido em','Nome','WhatsApp','Mensagem','Status'];
+    var linhas=leadsCache.map(function(l){
+      var d=new Date(l.criado_em); var data=isNaN(d)?'':d.toLocaleString('pt-BR');
+      return [data,l.nome,l.whatsapp,(l.mensagem||'').replace(/\s+/g,' '),l.status];
+    });
+    var csv=[cab].concat(linhas).map(function(row){ return row.map(function(c){ return '"'+String(c==null?'':c).replace(/"/g,'""')+'"'; }).join(';'); }).join('\r\n');
+    var blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+    var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='orcamentos-sorveteiro-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+  }
+
+  /* ---------- ligações ---------- */
+  $('l-entrar').onclick=entrar;
+  $('l-senha').addEventListener('keydown',function(e){ if(e.key==='Enter') entrar(); });
+  $('sair').onclick=sair;
+  $('nova-receita').onclick=function(){ abrirModal(null); };
+  $('mr-cancelar').onclick=fecharModal;
+  $('mr-salvar').onclick=salvarReceita;
+  $('modal-r').addEventListener('click',function(e){ if(e.target===$('modal-r')) fecharModal(); });
+  $('baixar-csv').onclick=baixarCSV;
+
+  if(TOKEN) abrirPainel();
+})();
+</script>
+</body>
+</html>
